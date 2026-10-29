@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Affordable Metal Standing-Seam Calculator</title>
+<style>
+:root {
+  --site-primary: #B82025;
+  --site-on-primary: #FFFFFF;
+  --site-secondary: #E5E5E5;
+  --site-on-secondary: #333333;
+  --site-background: #F5F5F5;
+  --site-on-background: #292929;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  --surface: light-dark(#FFFFFF, #18232A);
+  --surface-2: light-dark(#EEEEEE, #292929);
+  --text: light-dark(#292929, #F5F5F5);
+  --muted: light-dark(#666666, #BDBDBD);
+  --border: light-dark(#D2D2D2, #4A4A4A);
+  --good: light-dark(#176B48, #70D7A8);
+  --warn: light-dark(#8B5A11, #F3C66B);
+  --bad-bg: light-dark(#F0F0F0, #302626);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); color: var(--text); background: var(--site-background); }
+#app { min-height: 100vh; width: 100%; border-radius: 0; background-color: var(--site-background); color: var(--site-on-background); }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+.topbar { background: var(--site-primary); color: var(--site-on-primary); padding: calc(22px * var(--site-spacing-scale)) max(20px, calc((100vw - 1120px)/2)); }
+.brand { display:flex; align-items:center; gap:13px; }
+.logo { width:44px; height:44px; border-radius: calc(12px * var(--site-radius-scale)); background:rgba(255,255,255,.14); display:grid; place-items:center; font-size:22px; }
+h1 { font-family: var(--site-font-heading); font-size:calc(28px * var(--site-heading-scale)); margin:0; letter-spacing:-.6px; }
+.subtitle { margin:5px 0 0; color:#F5DCDD; font-size:14px; }
+.topmeta { margin-left:auto; text-align:right; font-size:12px; color:#F5DCDD; }
+.wrap { max-width:1120px; margin:0 auto; padding:24px 20px 48px; }
+.notice { display:flex; align-items:flex-start; gap:10px; padding:14px 16px; background:var(--bad-bg); border:1px solid var(--border); border-radius:calc(12px * var(--site-radius-scale)); margin-bottom:20px; color:var(--text); font-size:13px; line-height:1.5; }
+.notice strong { color:var(--site-primary); }
+.layout { display:grid; grid-template-columns:minmax(0, 1.08fr) minmax(320px, .92fr); gap:20px; align-items:start; }
+.panel { background:var(--surface); border:1px solid var(--border); border-radius:calc(16px * var(--site-radius-scale)); padding:22px; box-shadow:0 2px 8px rgba(20,40,50,.035); }
+.panel + .panel { margin-top:18px; }
+.panelhead { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:18px; }
+h2 { font-size:calc(18px * var(--site-heading-scale)); letter-spacing:-.25px; margin:0; }
+.kicker { color:var(--muted); font-size:12px; margin-top:5px; }
+.tag { font-size:11px; border-radius:999px; padding:5px 9px; white-space:nowrap; background:var(--site-secondary); color:var(--site-on-secondary); font-weight:650; }
+.fieldgrid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.field { display:flex; flex-direction:column; gap:7px; }
+label { font-size:13px; font-weight:650; }
+.hint { font-size:11px; color:var(--muted); font-weight:400; }
+input, select, textarea { width:100%; border:1px solid var(--border); background:var(--surface); color:var(--text); padding:11px 12px; border-radius:calc(9px * var(--site-radius-scale)); outline:none; }
+input:focus, select:focus, textarea:focus { border-color:var(--site-primary); box-shadow:0 0 0 3px color-mix(in srgb, var(--site-primary) 18%, transparent); }
+input[type=checkbox] { width:16px; height:16px; accent-color:var(--site-primary); }
+.divider { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.resultgrid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.metric { background:var(--surface-2); border-radius:calc(12px * var(--site-radius-scale)); padding:16px; min-width:0; }
+.metric .label { color:var(--muted); font-size:12px; margin-bottom:9px; }
+.metric .value { font-size:clamp(21px, 3vw, 29px); font-weight:750; letter-spacing:-.7px; overflow-wrap:anywhere; }
+.metric .unit { color:var(--muted); font-size:12px; font-weight:500; }
+.formula { margin-top:13px; border:1px solid var(--border); border-radius:10px; padding:12px 13px; font-size:12px; line-height:1.55; color:var(--muted); }
+.formula code { color:var(--text); font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+.full { grid-column:1/-1; }
+.trimlist { display:flex; flex-direction:column; gap:9px; }
+.trimrow { display:grid; grid-template-columns:20px minmax(0,1fr) 105px; gap:10px; align-items:center; padding:11px 12px; border:1px solid var(--border); border-radius:10px; }
+.trimrow label { font-weight:600; }
+.trimrow .hint { display:block; margin-top:3px; line-height:1.35; }
+.trimrow input[type=number] { padding:8px 9px; }
+.trimrow.disabled { opacity:.72; }
+.status { color:var(--warn); font-size:11px; font-weight:700; margin-top:4px; }
+.btnrow { display:flex; flex-wrap:wrap; gap:9px; margin-top:16px; }
+.btn { border:1px solid var(--border); border-radius:calc(10px * var(--site-radius-scale)); padding:10px 14px; background:var(--surface); color:var(--text); font-weight:650; font-size:13px; }
+.btn.primary { background:var(--site-primary); border-color:var(--site-primary); color:var(--site-on-primary); }
+.btn:hover { filter:brightness(.97); }
+.summary { width:100%; border-collapse:collapse; font-size:13px; }
+.summary th { text-align:left; color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.4px; padding:0 8px 10px; }
+.summary td { border-top:1px solid var(--border); padding:12px 8px; }
+.summary td:last-child, .summary th:last-child { text-align:right; }
+.pill { display:inline-block; padding:4px 7px; border-radius:6px; font-size:10px; font-weight:700; background:var(--bad-bg); color:var(--warn); }
+.empty { padding:15px; border:1px dashed var(--border); color:var(--muted); border-radius:10px; font-size:13px; line-height:1.5; }
+.footer { text-align:center; color:var(--muted); font-size:11px; padding:24px 0 0; }
+@media(max-width:780px) { .layout { grid-template-columns:1fr; } .topmeta { display:none; } .wrap { padding:16px 12px 32px; } .panel { padding:17px; } }
+@media(max-width:420px) { .fieldgrid { grid-template-columns:1fr; } .trimrow { grid-template-columns:20px minmax(0,1fr) 84px; padding:9px; } h1 { font-size:calc(23px * var(--site-heading-scale)); } }
+@media print { body, #app { background:#fff; color:#111; } .topbar { background:#fff; color:#111; padding:0 0 16px; border-bottom:2px solid #B82025; } .subtitle,.topmeta { color:#444; } .wrap { padding:15px 0; } .layout { display:block; } .panel { box-shadow:none; break-inside:avoid; margin-bottom:14px; } .no-print, .notice { display:none !important; } input,select { border:0; padding:0; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div><h1>Affordable Metal Standing-Seam Calculator</h1><p class="subtitle">Panel conversion · Trim tracking · Material summary</p></div>
+      <div class="topmeta">ESTIMATING WORKSPACE<br>Standing seam · 14 × 1 / 16 × 1 / 18 × 1 / 20 × 1</div>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="notice"><span aria-hidden="true">⚠</span><div><strong>Rules still needed for trim and accessories.</strong> This calculator uses the conversion for the selected 14×1, 16×1, 18×1, or 20×1 standing-seam panel. It will not guess trim lengths, screw counts, closure quantities, or panel layout rules. Add the measurements you know and complete the missing formulas when ready.</div></div>
+    <div class="layout">
+      <section>
+        <div class="panel">
+          <div class="panelhead"><div><h2>Project measurements</h2><div class="kicker">Start with the area you need to convert.</div></div><span class="tag">01 · INPUTS</span></div>
+          <div class="fieldgrid">
+            <div class="field"><label for="material">Material type</label><select id="material"><option value="16×1 Standing Seam">16×1 Standing Seam</option><option value="14×1 Standing Seam">14×1 Standing Seam</option><option value="18×1 Standing Seam">18×1 Standing Seam</option><option value="20×1 Standing Seam">20×1 Standing Seam</option><option value="Other / custom">Other / custom (uses 16×1 factor)</option></select></div>
+            <div class="field"><label for="area">Square feet (SF)</label><input id="area" type="number" min="0" step="any" placeholder="Enter area"></div>
+          </div>
+          <div class="formula"><strong>Your formula</strong><br><code id="conversionFormula">Linear feet = square feet ÷ 1.33333333333</code><br>Conversion factor changes with the selected standing-seam panel.</div>
+          <hr class="divider">
+          <div class="panelhead"><div><h2>Calculated quantities</h2><div class="kicker">Updates as you type.</div></div></div>
+          <div class="resultgrid">
+            <div class="metric"><div class="label">Calculated linear feet</div><div class="value" id="lf">— <span class="unit">LF</span></div></div>
+            <div class="metric full"><div class="label">Formula check</div><div id="calculationText" style="font-size:13px;line-height:1.6">Enter square footage to calculate linear feet.</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panelhead"><div><h2>Trim & accessories</h2><div class="kicker">Enter trim and accessory quantities in linear feet (LF).</div></div><span class="tag">02 · MATERIALS</span></div>
+          <p class="hint" style="font-size:12px;line-height:1.6;margin-top:-5px;margin-bottom:14px">Enter the length in linear feet (LF) for each trim material. Drip edge, rake trim, and ridge trim can be entered directly.</p>
+          <div class="trimlist" id="trimList"></div>
+          <div class="btnrow no-print"><button class="btn" id="addCustom">+ Add custom material</button></div>
+        </div>
+      </section>
+      <section>
+        <div class="panel">
+          <div class="panelhead"><div><h2>Job material summary</h2><div class="kicker">A printable snapshot of this takeoff.</div></div><span class="tag">03 · SUMMARY</span></div>
+          <div class="resultgrid" style="margin-bottom:18px">
+            <div class="metric full"><div class="label">Trim items tracked</div><div class="value" id="tracked">0 <span class="unit">items</span></div></div>
+          </div>
+          <div style="overflow-x:auto"><table class="summary"><thead><tr><th>Material</th><th>Quantity (LF)</th><th>Feet</th></tr></thead><tbody id="summaryBody"><tr><td colspan="3" style="color:var(--muted)">Enter measurements to populate your summary.</td></tr></tbody></table></div>
+          <div class="btnrow no-print"><button class="btn primary" id="printBtn">Print / Save PDF</button><button class="btn" id="csvBtn">Export CSV</button><button class="btn" id="resetBtn">Clear project</button></div>
+        </div>
+      </section>
+    </div>
+    <div class="footer">Affordable Metal Standing-Seam Calculator · Quantities depend on measurements and the estimating rules entered.</div>
+  </main>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const defaultMaterials = [
+    {name:'Drip edge', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Rake trim', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Starter trim', detail:'Equals the full entered rake trim quantity (1:1)', value:'', formulaMissing:false, linkedTo:'Rake trim'},
+    {name:'Ridge trim', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'SnapZ', detail:'Ridgecap × 2 ÷ selected conversion factor', value:'', formulaMissing:false, calculatedFrom:'Ridge trim'},
+    {name:'Hips', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Sidewall', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Endwall', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Upper gambrel', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Lower gambrel', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Reverse J-trim', detail:'Hips × 2 + Sidewall + Endwall + Upper gambrel + Lower gambrel', value:'', formulaMissing:false, calculatedFrom:'Reverse J-trim'},
+    {name:'Valley trim', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Valley cleat', detail:'Valley trim × 2 + Upper gambrel + Lower gambrel', value:'', formulaMissing:false, calculatedFrom:'Valley cleat'},
+    {name:'Pop rivets', detail:'(Ridgecap × 2 + Hips × 2 + Endwall + Sidewall + Lower gambrel + Upper gambrel) ÷ selected conversion factor', value:'', formulaMissing:false, calculatedFrom:'Pop rivets'},
+  ];
+  let materials = defaultMaterials.map((m,i)=>({...m,id:i}));
+  let nextId = materials.length;
+  const num = id => Math.max(0, Number($(id).value) || 0);
+  const conversionFactor = () => $('material').value === '14×1 Standing Seam' ? 1.166666 : $('material').value === '18×1 Standing Seam' ? 1.5 : $('material').value === '20×1 Standing Seam' ? 1.666666 : 1.33333333333;
+  const fmt = n => Number(n).toLocaleString('en-US',{maximumFractionDigits:2,minimumFractionDigits:0});
+  function renderMaterials() {
+    $('trimList').innerHTML = materials.filter(m => m.name !== 'SnapZ').map(m => `
+      <div class="trimrow ${m.formulaMissing?'disabled':''}" data-id="${m.id}">
+        <input aria-label="Include ${esc(m.name)} in summary" type="checkbox" class="include" ${m.value!==''?'checked':''}>
+        <div><label>${esc(m.name)}</label><span class="hint">${esc(m.detail)}</span>${m.formulaMissing?'<div class="status">RULE NEEDED</div>':''}${m.linkedTo?'<div class="status">LINKED 1:1 TO RAKE TRIM</div>':''}</div>
+        <div><input aria-label="${esc(m.name)} length in feet" class="length" type="number" min="0" step="any" placeholder="Feet" value="${m.value}" ${(m.linkedTo||m.calculatedFrom)?'readonly title="Automatically calculated from another material"':''}></div>
+      </div>`).join('');
+    $('trimList').querySelectorAll('.length').forEach(el => el.addEventListener('input', e => {
+      const id = Number(e.target.closest('.trimrow').dataset.id); const m=materials.find(x=>x.id===id); if(m.linkedTo||m.calculatedFrom)return; m.value=e.target.value; e.target.closest('.trimrow').querySelector('.include').checked=e.target.value!==''; update(); const starter=materials.find(x=>x.name==='Starter trim'&&x.linkedTo==='Rake trim'); const starterRow=starter&&$('trimList').querySelector(`[data-id="${starter.id}"]`); if(starterRow){starterRow.querySelector('.length').value=starter.value;starterRow.querySelector('.include').checked=starter.value!=='';}
+    }));
+    $('trimList').querySelectorAll('.include').forEach(el => el.addEventListener('change', e => {
+      const id = Number(e.target.closest('.trimrow').dataset.id); const m=materials.find(x=>x.id===id);
+      if(m.linkedTo||m.calculatedFrom){e.target.checked=m.value!=='';return;}
+      if (!e.target.checked) m.value=''; else if(m.value==='') m.value='0';
+      e.target.closest('.trimrow').querySelector('.length').value=m.value; update();
+    }));
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function update() {
+    const rake = materials.find(m=>m.name==='Rake trim');
+    const starter = materials.find(m=>m.name==='Starter trim' && m.linkedTo==='Rake trim');
+    if(rake && starter) starter.value = rake.value;
+    const factor = conversionFactor();
+    const panelFeet = $('area').value==='' ? null : num('area') / factor;
+    const eave = materials.find(m=>m.name==='Drip edge');
+    const htbValue = !eave || eave.value==='' ? '' : String(Math.ceil((Number(eave.value)||0)/67));
+    const htsValue = panelFeet===null ? '' : String(Math.ceil(panelFeet/1000));
+    const snapzItem = materials.find(m=>m.name==='SnapZ');
+    if(snapzItem) snapzItem.detail = `Ridgecap × 2 ÷ ${factor}`;
+    const popRivetsItem = materials.find(m=>m.name==='Pop rivets');
+    if(popRivetsItem) popRivetsItem.detail = `(Ridgecap × 2 + Hips × 2 + Endwall + Sidewall + Lower gambrel + Upper gambrel) ÷ ${factor}`;
+    const ridge = materials.find(m=>m.name==='Ridge trim');
+    const snapz = materials.find(m=>m.name==='SnapZ' && m.calculatedFrom==='Ridge trim');
+    if(ridge && snapz) snapz.value = ridge.value==='' ? '' : String((Number(ridge.value)||0) * 2 / conversionFactor());
+    const reverseJ = materials.find(m=>m.name==='Reverse J-trim' && m.calculatedFrom==='Reverse J-trim');
+    if(reverseJ) {
+      const inputs = ['Hips','Sidewall','Endwall','Upper gambrel','Lower gambrel'].map(name=>materials.find(m=>m.name===name));
+      reverseJ.value = inputs.some(m=>!m || m.value==='') ? '' : String((Number(inputs[0].value)||0)*2 + inputs.slice(1).reduce((sum,m)=>sum+(Number(m.value)||0),0));
+    }
+    const valleyCleat = materials.find(m=>m.name==='Valley cleat' && m.calculatedFrom==='Valley cleat');
+    if(valleyCleat) {
+      const inputs = ['Valley trim','Upper gambrel','Lower gambrel'].map(name=>materials.find(m=>m.name===name));
+      valleyCleat.value = inputs.some(m=>!m || m.value==='') ? '' : String((Number(inputs[0].value)||0)*2 + (Number(inputs[1].value)||0) + (Number(inputs[2].value)||0));
+    }
+    const popRivets = materials.find(m=>m.name==='Pop rivets' && m.calculatedFrom==='Pop rivets');
+    if(popRivets) {
+      const inputs = ['Ridge trim','Hips','Endwall','Sidewall','Lower gambrel','Upper gambrel'].map(name=>materials.find(m=>m.name===name));
+      popRivets.value = inputs.some(m=>!m || m.value==='') ? '' : String(((Number(inputs[0].value)||0)*2 + (Number(inputs[1].value)||0)*2 + (Number(inputs[2].value)||0) + (Number(inputs[3].value)||0) + (Number(inputs[4].value)||0) + (Number(inputs[5].value)||0)) / conversionFactor());
+    }
+    const area = $('area').value==='' ? null : num('area');
+    const lf = area===null ? null : area / factor;
+    $('conversionFormula').textContent = `Linear feet = square feet ÷ ${factor}`;
+    $('lf').innerHTML = (lf===null?'—':fmt(lf))+' <span class="unit">LF</span>';
+    $('calculationText').textContent = area===null ? 'Enter square footage to calculate linear feet.' : `${fmt(area)} SF ÷ ${factor} = ${fmt(lf)} LF.`;
+    const active = materials.filter(m=>m.value!=='' && Number(m.value)>=0);
+    $('tracked').innerHTML = active.length+' <span class="unit">items</span>';
+    const rows=[];
+    if(lf!==null) rows.push(`<tr><td>${esc($('material').value)}<br><span class="hint">Calculated area conversion</span></td><td>${fmt(lf)} LF</td><td>—</td></tr>`);
+    active.forEach(m=>{ const v=Number(m.value)||0; rows.push(`<tr><td>${esc(m.name)}${m.formulaMissing?'<br><span class="pill">RULE NEEDED</span>':''}</td><td>${fmt(v)} LF</td><td>${fmt(v)}</td></tr>`); });
+    if(htbValue!=='') rows.push(`<tr><td>HTB (butyl back ice and water underlayment)<br><span class="hint">Drip edge ÷ 67 = rolls of HTB</span></td><td>${htbValue} rolls</td><td>—</td></tr>`);
+    rows.push(`<tr><td>6 hr on site roll fee</td><td>—</td><td>—</td></tr>`);
+    rows.push(`<tr><td>Touch up pen</td><td>—</td><td>—</td></tr>`);
+    if(htsValue!=='') rows.push(`<tr><td>HTS (synthetic underlayment)<br><span class="hint">Linear panel feet ÷ 1000 = rolls of HTS</span></td><td>${htsValue} rolls</td><td>—</td></tr>`);
+    $('summaryBody').innerHTML = rows.length?rows.join(''):'<tr><td colspan="3" style="color:var(--muted)">Enter square footage or measured material lengths to populate your summary.</td></tr>';
+  }
+  ['area','material'].forEach(id=>$(id).addEventListener('input',update));
+  $('addCustom').addEventListener('click',()=>{
+    const name=prompt('Name this material (e.g. Foam closure):'); if(!name||!name.trim()) return;
+    materials.push({id:nextId++,name:name.trim(),detail:'Custom material — enter measured linear feet',value:'',formulaMissing:true}); renderMaterials(); update();
+  });
+  $('printBtn').addEventListener('click',()=>window.print());
+  $('resetBtn').addEventListener('click',()=>{ if(!confirm('Clear this project and all entered measurements?'))return; $('area').value=''; $('material').selectedIndex=0; materials=defaultMaterials.map((m,i)=>({...m,id:i})); nextId=materials.length; renderMaterials(); update(); });
+  $('csvBtn').addEventListener('click',()=>{
+    const area=$('area').value===''?null:num('area'), factor=conversionFactor();
+    const rows=[['Material type',$('material').value],['Area SF',area===null?'':area],['Conversion factor',factor],['Calculated LF',area===null?'':area/factor],[],['Material','Quantity (LF)','Feet','Formula status']];
+    if(area!==null) rows.push([$('material').value,area/factor,'','User-provided area conversion']);
+    materials.filter(m=>m.value!=='').forEach(m=>{const v=Number(m.value)||0;rows.push([m.name,v,v,m.formulaMissing?'Quantity formula not provided':'Entered / calculated quantity']);});
+    const eave=materials.find(m=>m.name==='Drip edge');
+    rows.push(['6 hr on site roll fee','','','Always included']);
+    rows.push(['Touch up pen','','','Always included']);
+    if(eave&&eave.value!=='') rows.push(['HTB (butyl back ice and water underlayment)',Math.ceil((Number(eave.value)||0)/67),'','Drip edge ÷ 67 = rolls of HTB']);
+    if(area!==null) rows.push(['HTS (synthetic underlayment)',Math.ceil((area/factor)/1000),'','Linear panel feet ÷ 1000 = rolls of HTS']);
+    const csv=rows.map(row=>row.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}), url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='affordable-metal-standing-seam.csv'; a.click(); URL.revokeObjectURL(url);
+  });
+  renderMaterials(); update();
+})();
+</script>
+</body>
+</html>
