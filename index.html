@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metal Room Takeoff</title>
+<style>
+:root {
+  --site-primary: #B82025;
+  --site-on-primary: #FFFFFF;
+  --site-secondary: #E5E5E5;
+  --site-on-secondary: #333333;
+  --site-background: #F5F5F5;
+  --site-on-background: #292929;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  --surface: light-dark(#FFFFFF, #18232A);
+  --surface-2: light-dark(#EEEEEE, #292929);
+  --text: light-dark(#292929, #F5F5F5);
+  --muted: light-dark(#666666, #BDBDBD);
+  --border: light-dark(#D2D2D2, #4A4A4A);
+  --good: light-dark(#176B48, #70D7A8);
+  --warn: light-dark(#8B5A11, #F3C66B);
+  --bad-bg: light-dark(#F0F0F0, #302626);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); color: var(--text); background: var(--site-background); }
+#app { min-height: 100vh; width: 100%; border-radius: 0; background-color: var(--site-background); color: var(--site-on-background); }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+.topbar { background: var(--site-primary); color: var(--site-on-primary); padding: calc(22px * var(--site-spacing-scale)) max(20px, calc((100vw - 1120px)/2)); }
+.brand { display:flex; align-items:center; gap:13px; }
+.logo { width:44px; height:44px; border-radius: calc(12px * var(--site-radius-scale)); background:rgba(255,255,255,.14); display:grid; place-items:center; font-size:22px; }
+.company-logo { width:180px; height:100px; object-fit:contain; background:#FFFFFF; border-radius:10px; padding:5px; flex-shrink:0; }
+h1 { font-family: var(--site-font-heading); font-size:calc(28px * var(--site-heading-scale)); margin:0; letter-spacing:-.6px; }
+.subtitle { margin:5px 0 0; color:#F5DCDD; font-size:14px; }
+.topmeta { margin-left:auto; text-align:right; font-size:12px; color:#F5DCDD; }
+.wrap { max-width:1120px; margin:0 auto; padding:24px 20px 48px; }
+.notice { display:flex; align-items:flex-start; gap:10px; padding:14px 16px; background:var(--bad-bg); border:1px solid var(--border); border-radius:calc(12px * var(--site-radius-scale)); margin-bottom:20px; color:var(--text); font-size:13px; line-height:1.5; }
+.notice strong { color:var(--site-primary); }
+.layout { display:grid; grid-template-columns:minmax(0, 1.08fr) minmax(320px, .92fr); gap:20px; align-items:start; }
+.panel { background:var(--surface); border:1px solid var(--border); border-radius:calc(16px * var(--site-radius-scale)); padding:22px; box-shadow:0 2px 8px rgba(20,40,50,.035); }
+.panel + .panel { margin-top:18px; }
+.panelhead { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:18px; }
+h2 { font-size:calc(18px * var(--site-heading-scale)); letter-spacing:-.25px; margin:0; }
+.kicker { color:var(--muted); font-size:12px; margin-top:5px; }
+.tag { font-size:11px; border-radius:999px; padding:5px 9px; white-space:nowrap; background:var(--site-secondary); color:var(--site-on-secondary); font-weight:650; }
+.fieldgrid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.field { display:flex; flex-direction:column; gap:7px; }
+label { font-size:13px; font-weight:650; }
+.hint { font-size:11px; color:var(--muted); font-weight:400; }
+input, select, textarea { width:100%; border:1px solid var(--border); background:var(--surface); color:var(--text); padding:11px 12px; border-radius:calc(9px * var(--site-radius-scale)); outline:none; }
+input:focus, select:focus, textarea:focus { border-color:var(--site-primary); box-shadow:0 0 0 3px color-mix(in srgb, var(--site-primary) 18%, transparent); }
+input[type=checkbox] { width:16px; height:16px; accent-color:var(--site-primary); }
+.divider { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.resultgrid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.metric { background:var(--surface-2); border-radius:calc(12px * var(--site-radius-scale)); padding:16px; min-width:0; }
+.metric .label { color:var(--muted); font-size:12px; margin-bottom:9px; }
+.metric .value { font-size:clamp(21px, 3vw, 29px); font-weight:750; letter-spacing:-.7px; overflow-wrap:anywhere; }
+.metric .unit { color:var(--muted); font-size:12px; font-weight:500; }
+.formula { margin-top:13px; border:1px solid var(--border); border-radius:10px; padding:12px 13px; font-size:12px; line-height:1.55; color:var(--muted); }
+.formula code { color:var(--text); font-family:ui-monospace, SFMono-Regular, Menlo, monospace; }
+.full { grid-column:1/-1; }
+.trimlist { display:flex; flex-direction:column; gap:9px; }
+.trimrow { display:grid; grid-template-columns:20px minmax(0,1fr) 105px; gap:10px; align-items:center; padding:11px 12px; border:1px solid var(--border); border-radius:10px; }
+.trimrow label { font-weight:600; }
+.trimrow .hint { display:block; margin-top:3px; line-height:1.35; }
+.trimrow input[type=number] { padding:8px 9px; }
+.trimrow.disabled { opacity:.72; }
+.status { color:var(--warn); font-size:11px; font-weight:700; margin-top:4px; }
+.btnrow { display:flex; flex-wrap:wrap; gap:9px; margin-top:16px; }
+.btn { border:1px solid var(--border); border-radius:calc(10px * var(--site-radius-scale)); padding:10px 14px; background:var(--surface); color:var(--text); font-weight:650; font-size:13px; }
+.btn.primary { background:var(--site-primary); border-color:var(--site-primary); color:var(--site-on-primary); }
+.btn:hover { filter:brightness(.97); }
+.summary { width:100%; border-collapse:collapse; font-size:13px; }
+.summary th { text-align:left; color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.4px; padding:0 8px 10px; }
+.summary td { border-top:1px solid var(--border); padding:12px 8px; }
+.summary td:last-child, .summary th:last-child { text-align:right; }
+.pill { display:inline-block; padding:4px 7px; border-radius:6px; font-size:10px; font-weight:700; background:var(--bad-bg); color:var(--warn); }
+.empty { padding:15px; border:1px dashed var(--border); color:var(--muted); border-radius:10px; font-size:13px; line-height:1.5; }
+.footer { text-align:center; color:var(--muted); font-size:11px; padding:24px 0 0; }
+@media(max-width:780px) { .layout { grid-template-columns:1fr; } .topmeta { display:none; } .wrap { padding:16px 12px 32px; } .panel { padding:17px; } .company-logo { width:120px; height:76px; } }
+@media(max-width:420px) { .fieldgrid { grid-template-columns:1fr; } .trimrow { grid-template-columns:20px minmax(0,1fr) 84px; padding:9px; } h1 { font-size:calc(23px * var(--site-heading-scale)); } }
+@media print { body, #app { background:#fff; color:#111; } .topbar { background:#fff; color:#111; padding:0 0 16px; border-bottom:2px solid #B82025; } .subtitle,.topmeta { color:#444; } .wrap { padding:15px 0; } .layout { display:block; } .panel { box-shadow:none; break-inside:avoid; margin-bottom:14px; } .no-print, .notice { display:none !important; } input,select { border:0; padding:0; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <img class="company-logo" alt="Affordable Metal Mfg.com — Our Business Is Rolling" src="data:image/webp;base64,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" />
+      <div><h1>Metal Room Takeoff</h1><p class="subtitle">Panel conversion · Trim tracking · Material summary</p></div>
+      <div class="topmeta">ESTIMATING WORKSPACE<br>Standing seam · 14 × 1 / 16 × 1 / 18 × 1 / 20 × 1</div>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="notice"><span aria-hidden="true">⚠</span><div><strong>Rules still needed for trim and accessories.</strong> This calculator uses the conversion for the selected 14×1, 16×1, 18×1, or 20×1 standing-seam panel. It will not guess trim lengths, screw counts, closure quantities, or panel layout rules. Add the measurements you know and complete the missing formulas when ready.</div></div>
+    <div class="layout">
+      <section>
+        <div class="panel">
+          <div class="panelhead"><div><h2>Project measurements</h2><div class="kicker">Start with the area you need to convert.</div></div><span class="tag">01 · INPUTS</span></div>
+          <div class="fieldgrid">
+            <div class="field"><label for="material">Material type</label><select id="material"><option value="16×1 Standing Seam">16×1 Standing Seam</option><option value="14×1 Standing Seam">14×1 Standing Seam</option><option value="18×1 Standing Seam">18×1 Standing Seam</option><option value="20×1 Standing Seam">20×1 Standing Seam</option><option value="Other / custom">Other / custom (uses 16×1 factor)</option></select></div>
+            <div class="field"><label for="area">Square feet (SF)</label><input id="area" type="number" min="0" step="any" placeholder="Enter area"></div>
+          </div>
+          <div class="formula"><strong>Your formula</strong><br><code id="conversionFormula">Linear feet = square feet ÷ 1.33333333333</code><br>Conversion factor changes with the selected standing-seam panel.</div>
+          <hr class="divider">
+          <div class="panelhead"><div><h2>Calculated quantities</h2><div class="kicker">Updates as you type.</div></div></div>
+          <div class="resultgrid">
+            <div class="metric"><div class="label">Calculated linear feet</div><div class="value" id="lf">— <span class="unit">LF</span></div></div>
+            <div class="metric full"><div class="label">Formula check</div><div id="calculationText" style="font-size:13px;line-height:1.6">Enter square footage to calculate linear feet.</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panelhead"><div><h2>Trim & accessories</h2><div class="kicker">Enter trim and accessory quantities in pieces.</div></div><span class="tag">02 · MATERIALS</span></div>
+          <p class="hint" style="font-size:12px;line-height:1.6;margin-top:-5px;margin-bottom:14px">Enter the quantity in pieces for each material. Drip edge, rake trim, and ridge trim can be entered directly.</p>
+          <div class="trimlist" id="trimList"></div>
+          <div class="btnrow no-print"><button class="btn" id="addCustom">+ Add custom material</button></div>
+        </div>
+      </section>
+      <section>
+        <div class="panel">
+          <div class="panelhead"><div><h2>Job material summary</h2><div class="kicker">A printable snapshot of this takeoff.</div></div><span class="tag">03 · SUMMARY</span></div>
+          <div class="resultgrid" style="margin-bottom:18px">
+            <div class="metric full"><div class="label">Trim items tracked</div><div class="value" id="tracked">0 <span class="unit">items</span></div></div>
+          </div>
+          <div style="overflow-x:auto"><table class="summary"><thead><tr><th>Material</th><th>Quantity (pieces)</th><th>Pieces</th></tr></thead><tbody id="summaryBody"><tr><td colspan="3" style="color:var(--muted)">Enter measurements to populate your summary.</td></tr></tbody></table></div>
+          <div class="btnrow no-print"><button class="btn primary" id="printBtn">Print / Save PDF</button><button class="btn" id="csvBtn">Export CSV</button><button class="btn" id="resetBtn">Clear project</button></div>
+        </div>
+      </section>
+    </div>
+    <div class="footer">Metal Room Takeoff · Working preview · Quantities depend on measurements and the estimating rules entered.</div>
+  </main>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const defaultMaterials = [
+    {name:'Drip edge', detail:'Enter quantity in pieces', value:'', formulaMissing:false},
+    {name:'Rake trim', detail:'Enter quantity in pieces', value:'', formulaMissing:false},
+    {name:'Starter trim', detail:'Equals the full entered rake trim quantity (1:1)', value:'', formulaMissing:false, linkedTo:'Rake trim'},
+    {name:'Ridge trim', detail:'Enter quantity in pieces', value:'', formulaMissing:false},
+    {name:'SnapZ', detail:'Ridgecap × 2 ÷ selected conversion factor', value:'', formulaMissing:false, calculatedFrom:'Ridge trim'},
+    {name:'Hips', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Sidewall', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Endwall', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Upper gambrel', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Lower gambrel', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Reverse J-trim', detail:'Hips × 2 + Sidewall + Endwall + Upper gambrel + Lower gambrel', value:'', formulaMissing:false, calculatedFrom:'Reverse J-trim'},
+    {name:'Valley trim', detail:'Enter measured total length in LF', value:'', formulaMissing:false},
+    {name:'Valley cleat', detail:'Valley trim × 2 + Upper gambrel + Lower gambrel', value:'', formulaMissing:false, calculatedFrom:'Valley cleat'},
+    {name:'Pop rivets', detail:'(Ridgecap × 2 + Hips × 2 + Endwall + Sidewall + Lower gambrel + Upper gambrel) ÷ selected conversion factor', value:'', formulaMissing:false, calculatedFrom:'Pop rivets'},
+  ];
+  let materials = defaultMaterials.map((m,i)=>({...m,id:i}));
+  let nextId = materials.length;
+  const num = id => Math.max(0, Number($(id).value) || 0);
+  const conversionFactor = () => $('material').value === '14×1 Standing Seam' ? 1.166666 : $('material').value === '18×1 Standing Seam' ? 1.5 : $('material').value === '20×1 Standing Seam' ? 1.666666 : 1.33333333333;
+  const fmt = n => Number(n).toLocaleString('en-US',{maximumFractionDigits:2,minimumFractionDigits:0});
+  function renderMaterials() {
+    $('trimList').innerHTML = materials.map(m => `
+      <div class="trimrow ${m.formulaMissing?'disabled':''}" data-id="${m.id}">
+        <input aria-label="Include ${esc(m.name)} in summary" type="checkbox" class="include" ${m.value!==''?'checked':''}>
+        <div><label>${esc(m.name)}</label><span class="hint">${esc(m.detail)}</span>${m.formulaMissing?'<div class="status">RULE NEEDED</div>':''}${m.linkedTo?'<div class="status">LINKED 1:1 TO RAKE TRIM</div>':''}</div>
+        <div><input aria-label="${esc(m.name)} quantity in pieces" class="length" type="number" min="0" step="any" placeholder="Pieces" value="${m.value}" ${(m.linkedTo||m.calculatedFrom)?'readonly title="Automatically calculated from another material"':''}></div>
+      </div>`).join('');
+    $('trimList').querySelectorAll('.length').forEach(el => el.addEventListener('input', e => {
+      const id = Number(e.target.closest('.trimrow').dataset.id); const m=materials.find(x=>x.id===id); if(m.linkedTo||m.calculatedFrom)return; m.value=e.target.value; e.target.closest('.trimrow').querySelector('.include').checked=e.target.value!==''; update(); const starter=materials.find(x=>x.name==='Starter trim'&&x.linkedTo==='Rake trim'); const starterRow=starter&&$('trimList').querySelector(`[data-id="${starter.id}"]`); if(starterRow){starterRow.querySelector('.length').value=starter.value;starterRow.querySelector('.include').checked=starter.value!=='';}
+    }));
+    $('trimList').querySelectorAll('.include').forEach(el => el.addEventListener('change', e => {
+      const id = Number(e.target.closest('.trimrow').dataset.id); const m=materials.find(x=>x.id===id);
+      if(m.linkedTo||m.calculatedFrom){e.target.checked=m.value!=='';return;}
+      if (!e.target.checked) m.value=''; else if(m.value==='') m.value='0';
+      e.target.closest('.trimrow').querySelector('.length').value=m.value; update();
+    }));
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function update() {
+    const rake = materials.find(m=>m.name==='Rake trim');
+    const starter = materials.find(m=>m.name==='Starter trim' && m.linkedTo==='Rake trim');
+    if(rake && starter) starter.value = rake.value;
+    const factor = conversionFactor();
+    const panelFeet = $('area').value==='' ? null : num('area') / factor;
+    const eave = materials.find(m=>m.name==='Drip edge');
+    const htbValue = !eave || eave.value==='' ? '' : String(Math.ceil((Number(eave.value)||0)/67));
+    const htsValue = panelFeet===null ? '' : String(Math.ceil(panelFeet/1000));
+    const snapzItem = materials.find(m=>m.name==='SnapZ');
+    if(snapzItem) snapzItem.detail = `Ridgecap × 2 ÷ ${factor}`;
+    const popRivetsItem = materials.find(m=>m.name==='Pop rivets');
+    if(popRivetsItem) popRivetsItem.detail = `(Ridgecap × 2 + Hips × 2 + Endwall + Sidewall + Lower gambrel + Upper gambrel) ÷ ${factor}`;
+    const ridge = materials.find(m=>m.name==='Ridge trim');
+    const snapz = materials.find(m=>m.name==='SnapZ' && m.calculatedFrom==='Ridge trim');
+    if(ridge && snapz) snapz.value = ridge.value==='' ? '' : String((Number(ridge.value)||0) * 2 / conversionFactor());
+    const reverseJ = materials.find(m=>m.name==='Reverse J-trim' && m.calculatedFrom==='Reverse J-trim');
+    if(reverseJ) {
+      const inputs = ['Hips','Sidewall','Endwall','Upper gambrel','Lower gambrel'].map(name=>materials.find(m=>m.name===name));
+      reverseJ.value = inputs.some(m=>!m || m.value==='') ? '' : String((Number(inputs[0].value)||0)*2 + inputs.slice(1).reduce((sum,m)=>sum+(Number(m.value)||0),0));
+    }
+    const valleyCleat = materials.find(m=>m.name==='Valley cleat' && m.calculatedFrom==='Valley cleat');
+    if(valleyCleat) {
+      const inputs = ['Valley trim','Upper gambrel','Lower gambrel'].map(name=>materials.find(m=>m.name===name));
+      valleyCleat.value = inputs.some(m=>!m || m.value==='') ? '' : String((Number(inputs[0].value)||0)*2 + (Number(inputs[1].value)||0) + (Number(inputs[2].value)||0));
+    }
+    const popRivets = materials.find(m=>m.name==='Pop rivets' && m.calculatedFrom==='Pop rivets');
+    if(popRivets) {
+      const inputs = ['Ridge trim','Hips','Endwall','Sidewall','Lower gambrel','Upper gambrel'].map(name=>materials.find(m=>m.name===name));
+      popRivets.value = inputs.some(m=>!m || m.value==='') ? '' : String(((Number(inputs[0].value)||0)*2 + (Number(inputs[1].value)||0)*2 + (Number(inputs[2].value)||0) + (Number(inputs[3].value)||0) + (Number(inputs[4].value)||0) + (Number(inputs[5].value)||0)) / conversionFactor());
+    }
+    const area = $('area').value==='' ? null : num('area');
+    const lf = area===null ? null : area / factor;
+    $('conversionFormula').textContent = `Linear feet = square feet ÷ ${factor}`;
+    $('lf').innerHTML = (lf===null?'—':fmt(lf))+' <span class="unit">LF</span>';
+    $('calculationText').textContent = area===null ? 'Enter square footage to calculate linear feet.' : `${fmt(area)} SF ÷ ${factor} = ${fmt(lf)} LF.`;
+    const active = materials.filter(m=>m.value!=='' && Number(m.value)>=0);
+    $('tracked').innerHTML = active.length+' <span class="unit">items</span>';
+    const rows=[];
+    if(lf!==null) rows.push(`<tr><td>${esc($('material').value)}<br><span class="hint">Calculated area conversion</span></td><td>${fmt(lf)} LF</td><td>—</td></tr>`);
+    active.forEach(m=>{ const v=Number(m.value)||0; rows.push(`<tr><td>${esc(m.name)}${m.formulaMissing?'<br><span class="pill">RULE NEEDED</span>':''}</td><td>${fmt(v)} pieces</td><td>${fmt(v)}</td></tr>`); });
+    if(htbValue!=='') rows.push(`<tr><td>HTB (butyl back ice and water underlayment)<br><span class="hint">Drip edge ÷ 67 = rolls of HTB</span></td><td>${htbValue} rolls</td><td>—</td></tr>`);
+    if(htsValue!=='') rows.push(`<tr><td>HTS (synthetic underlayment)<br><span class="hint">Linear panel feet ÷ 1000 = rolls of HTS</span></td><td>${htsValue} rolls</td><td>—</td></tr>`);
+    $('summaryBody').innerHTML = rows.length?rows.join(''):'<tr><td colspan="3" style="color:var(--muted)">Enter square footage or measured material lengths to populate your summary.</td></tr>';
+  }
+  ['area','material'].forEach(id=>$(id).addEventListener('input',update));
+  $('addCustom').addEventListener('click',()=>{
+    const name=prompt('Name this material (e.g. Foam closure):'); if(!name||!name.trim()) return;
+    materials.push({id:nextId++,name:name.trim(),detail:'Custom material — enter measured linear feet',value:'',formulaMissing:true}); renderMaterials(); update();
+  });
+  $('printBtn').addEventListener('click',()=>window.print());
+  $('resetBtn').addEventListener('click',()=>{ if(!confirm('Clear this project and all entered measurements?'))return; $('area').value=''; $('material').selectedIndex=0; materials=defaultMaterials.map((m,i)=>({...m,id:i})); nextId=materials.length; renderMaterials(); update(); });
+  $('csvBtn').addEventListener('click',()=>{
+    const area=$('area').value===''?null:num('area'), factor=conversionFactor();
+    const rows=[['Material type',$('material').value],['Area SF',area===null?'':area],['Conversion factor',factor],['Calculated LF',area===null?'':area/factor],[],['Material','Quantity (pieces)','Pieces','Formula status']];
+    if(area!==null) rows.push([$('material').value,area/factor,'','User-provided area conversion']);
+    materials.filter(m=>m.value!=='').forEach(m=>{const v=Number(m.value)||0;rows.push([m.name,v,v,m.formulaMissing?'Quantity formula not provided':'Entered / calculated quantity']);});
+    const eave=materials.find(m=>m.name==='Drip edge');
+    if(eave&&eave.value!=='') rows.push(['HTB (butyl back ice and water underlayment)',Math.ceil((Number(eave.value)||0)/67),'','Drip edge ÷ 67 = rolls of HTB']);
+    if(area!==null) rows.push(['HTS (synthetic underlayment)',Math.ceil((area/factor)/1000),'','Linear panel feet ÷ 1000 = rolls of HTS']);
+    const csv=rows.map(row=>row.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}), url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='metal-room-takeoff.csv'; a.click(); URL.revokeObjectURL(url);
+  });
+  renderMaterials(); update();
+})();
+</script>
+</body>
+</html>
